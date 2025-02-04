@@ -1,0 +1,57 @@
+local Players = game:GetService("Players")
+local UserInputService = game:GetService("UserInputService")
+local RunService = game:GetService("RunService")
+local Camera = game.Workspace.CurrentCamera
+local LocalPlayer = Players.LocalPlayer
+local AimLockedTarget = nil
+local AimEnabled = false 
+
+local function getClosestTarget()
+    local closestTarget = nil
+    local shortestDistance = math.huge
+    
+    for _, player in pairs(Players:GetPlayers()) do
+        if player ~= LocalPlayer and player.Character and player.Character:FindFirstChild("Head") then
+            local targetPosition = player.Character.Head.Position
+            local screenPosition, onScreen = Camera:WorldToViewportPoint(targetPosition)
+            if onScreen then
+                local mouseLocation = UserInputService:GetMouseLocation()
+                local distance = (Vector2.new(screenPosition.X, screenPosition.Y) - mouseLocation).magnitude
+                if distance < shortestDistance then
+                    shortestDistance = distance
+                    closestTarget = player.Character.Head
+                end
+            end
+        end
+    end
+    
+    return closestTarget
+end
+
+local function aimLock()
+    if AimEnabled then
+        AimLockedTarget = getClosestTarget()
+    end
+end
+
+local function updateAim()
+    if AimEnabled and AimLockedTarget then
+        Camera.CFrame = CFrame.new(Camera.CFrame.Position, AimLockedTarget.Position)
+    end
+end
+
+UserInputService.InputBegan:Connect(function(input)
+    if input.KeyCode == Enum.KeyCode.P then 
+        AimEnabled = not AimEnabled
+    elseif input.UserInputType == Enum.UserInputType.MouseButton2 then 
+        aimLock()
+    end
+end)
+
+UserInputService.InputEnded:Connect(function(input)
+    if input.UserInputType == Enum.UserInputType.MouseButton2 then
+        AimLockedTarget = nil
+    end
+end)
+
+RunService.RenderStepped:Connect(updateAim)
