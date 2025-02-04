@@ -10,6 +10,9 @@ local Tabs = {
     Settings = Window:AddTab({ Title = "Settings", Icon = "settings" })
 }
 --paragrafos
+Tabs.Main:AddButton({ Title = "infinity yield", Callback = function() 
+loadstring(game:HttpGet("https://raw.githubusercontent.com/EdgeIY/infiniteyield/master/source"))()
+end })
 Tabs.Main:AddButton({ Title = "ESP", Callback = function() 
 loadstring(game:HttpGet("https://raw.githubusercontent.com/Derick143/esp3/refs/heads/main/esp%20hub.txt"))()
 end })
